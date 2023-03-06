@@ -13,7 +13,7 @@ namespace blackwidow {
 
 class HyperLogLog {
  public:
-  HyperLogLog(uint8_t precision, std::string origin_resiter);
+  HyperLogLog(uint8_t precision, const std::string &origin_resiter);
   ~HyperLogLog();
 
   double Estimate() const;

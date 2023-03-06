@@ -13,7 +13,7 @@ namespace blackwidow {
 
 const int32_t HLL_HASH_SEED = 313;
 
-HyperLogLog::HyperLogLog(uint8_t precision, std::string origin_register) {
+HyperLogLog::HyperLogLog(uint8_t precision, const std::string &origin_register) {
   b_ = precision;
   m_ = 1 << precision;
   alpha_ = Alpha();
