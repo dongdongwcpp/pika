@@ -7,6 +7,7 @@ project (blackwidow)
 add_subdirectory(tests)
 
 add_definitions(-DROCKSDB_PLATFORM_POSIX -DROCKSDB_LIB_IO_POSIX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 aux_source_directory(./src  DIR_SRCS)
 

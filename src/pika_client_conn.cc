@@ -184,6 +184,7 @@ void PikaClientConn::ProcessMonitor(const PikaCmdArgsType& argv) {
 void PikaClientConn::ProcessRedisCmds(const std::vector<pink::RedisCmdArgsType>& argvs, bool async, std::string* response) {
   if (async) {
     BgTaskArg* arg = new BgTaskArg();
+    // swap?
     arg->redis_cmds = argvs;
     arg->conn_ptr = std::dynamic_pointer_cast<PikaClientConn>(shared_from_this());
     g_pika_server->ScheduleClientPool(&DoBackgroundTask, arg);

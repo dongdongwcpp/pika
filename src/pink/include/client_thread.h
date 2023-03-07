@@ -147,8 +147,10 @@ class ClientThread : public Thread {
   ConnFactory *conn_factory_;
 
   slash::Mutex mu_;
+  // ?
   std::map<std::string, std::vector<std::string>> to_send_;  // ip+":"+port, to_send_msg
 
+  // user unorder map
   std::map<int, std::shared_ptr<PinkConn>> fd_conns_;
   std::map<std::string, std::shared_ptr<PinkConn>> ipport_conns_;
   std::set<int> connecting_fds_;

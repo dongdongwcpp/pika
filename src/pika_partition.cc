@@ -79,7 +79,7 @@ Partition::Partition(const std::string& table_name,
   db_ = std::shared_ptr<blackwidow::BlackWidow>(new blackwidow::BlackWidow());
   rocksdb::Status s = db_->Open(g_pika_server->bw_options(), db_path_);
 
-  lock_mgr_ = new slash::lock::LockMgr(1000, 0, std::make_shared<slash::lock::MutexFactoryImpl>());
+  lock_mgr_ = new slash::lock::LockMgr(10000, 0, std::make_shared<slash::lock::MutexFactoryImpl>());
 
   opened_ = s.ok() ? true : false;
   assert(db_);

@@ -653,6 +653,7 @@ void Cmd::ProcessCommand(std::shared_ptr<Partition> partition,
 void Cmd::InternalProcessCommand(std::shared_ptr<Partition> partition,
     std::shared_ptr<SyncMasterPartition> sync_partition, const HintKeys& hint_keys) {
   slash::lock::MultiRecordLock record_lock(partition->LockMgr());
+  
   if (is_write()) {
     if (!hint_keys.empty() && is_multi_partition() && !g_pika_conf->classic_mode()) {
       record_lock.Lock(hint_keys.keys);

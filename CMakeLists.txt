@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 set(CMAKE_CXX_STANDARD 17)
 project(pika)
 set(CMAKE_CXX_FLAGS  "-pthread -Wl,--no-as-needed -ldl")
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++   -lunwind")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EP_BASE_SUFFIX "buildtrees")
@@ -75,7 +77,7 @@ ExternalProject_Add(gflags
   1
   CMAKE_ARGS
   -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
-  -DGFLAGS_NAMESPACE=gflags
+  -DGFLAGS_NAMESPACE=google
   -DBUILD_STATIC_LIBS=ON
   -DBUILD_SHARED_LIBS=OFF
   BUILD_COMMAND
@@ -85,9 +87,9 @@ ExternalProject_Add(gflags
 set(GFLAGS_LIBRARIE ${INSTALL_LIBDIR}/libgflags.a)
 set(GFLAGS_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
 
+#这里不需要gflags
 ExternalProject_Add(glog
   DEPENDS
-  gflags
   gtest
   URL
   https://github.com/google/glog/archive/refs/tags/v0.6.0.tar.gz
@@ -107,7 +109,7 @@ ExternalProject_Add(glog
   1
   CMAKE_ARGS
   -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
-  -DWITH_GFLAGS=ON
+  -DWITH_GFLAGS=OFF
   -DBUILD_TESTING=OFF
   -DBUILD_STATIC_LIBS=ON
   -DBUILD_SHARED_LIBS=OFF
@@ -311,10 +313,11 @@ ExternalProject_Add(jemalloc
 set(JEMALLOC_LIBRARIE ${INSTALL_LIBDIR}/libjemalloc.a)
 set(JEMALLOC_INCLUDE_DIR ${INSTALL_INCLUDEDIR})
 
+#降级版本，以然后brpc在20.04兼容
 ExternalProject_Add(protobuf
   DEPENDS
   URL
-  https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-cpp-3.17.3.tar.gz
+  https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-cpp-3.6.1.tar.gz
   DOWNLOAD_NO_PROGRESS
   1
   UPDATE_COMMAND
@@ -405,6 +408,12 @@ add_subdirectory(src/pink)
 add_subdirectory(src/blackwidow)
 aux_source_directory(src DIR_SRCS)
 
+
+
+#include_directories(/root/tmp/braft/build/output/include)
+include_directories(/root/tmp/incubator-brpc/output/include)
+
+
 # # generate version
 string(TIMESTAMP TS "%Y-%m-%d %H:%M:%S" UTC)
 set(PIKA_BUILD_DATE "${TS}" CACHE STRING "the time we first built pika")
@@ -473,6 +482,13 @@ target_include_directories(${PROJECT_NAME}
   ${INSTALL_INCLUDEDIR}
 )
 
+list(APPEND EXTERNAL_LIBS "/root/tmp/braft/build/output/lib/libbraft.a")
+list(APPEND EXTERNAL_LIBS "/root/tmp/incubator-brpc/output/lib/libbrpc.a")
+list(APPEND EXTERNAL_LIBS "/usr/lib/x86_64-linux-gnu/libprotobuf.a")
+list(APPEND EXTERNAL_LIBS "/usr/lib/x86_64-linux-gnu/libleveldb.a")
+
+
+#删除自己的gflags，因为和brpc打架
 target_link_libraries(${PROJECT_NAME}
   blackwidow
   pink
@@ -480,9 +496,13 @@ target_link_libraries(${PROJECT_NAME}
   libglog.a
   librocksdb.a
   ${PROTOBUF_LIBRARY}
-  libgflags.a
   libsnappy.a
   libzstd.a
   liblz4.a
   libz.a
-  libjemalloc.a)
+  libjemalloc.a
+  ${EXTERNAL_LIBS}
+  /usr/lib/x86_64-linux-gnu/libgflags.a
+  /usr/lib/x86_64-linux-gnu/libtcmalloc_and_profiler.a
+  -lssl -lcrypto 
+  )

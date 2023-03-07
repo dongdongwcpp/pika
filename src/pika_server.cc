@@ -3,6 +3,9 @@
 // LICENSE file in the root directory of this source tree. An additional grant
 // of patent rights can be found in the PATENTS file in the same directory.
 
+#include <brpc/server.h>
+
+
 #include "include/pika_server.h"
 
 #include <ctime>
@@ -222,7 +225,10 @@ bool PikaServer::ServerInit() {
 }
 
 void PikaServer::Start() {
-  int ret = 0;
+
+  int ret = brpc::StartDummyServerAt(8888/*port*/); 
+
+  ret = 0;
   // start rsync first, rocksdb opened fd will not appear in this fork
   ret = pika_rsync_service_->StartRsync();
   if (0 != ret) {

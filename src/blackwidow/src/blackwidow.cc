@@ -20,6 +20,7 @@ namespace blackwidow {
 
 Status BlackwidowOptions::ResetOptions(const OptionType& option_type,
     const std::unordered_map<std::string, std::string>& options_map) {
+      
   std::unordered_map<std::string, MemberTypeInfo>& options_member_type_info = mutable_cf_options_member_type_info;
   char* opt = reinterpret_cast<char*>(static_cast<rocksdb::ColumnFamilyOptions*>(&options));
   if (option_type == OptionType::kDB) {
